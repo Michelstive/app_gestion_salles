@@ -1,4 +1,6 @@
-
+git add .
+git commit -m "Initialisation de l'architecture en couches et installation des dépendances"
+git push
 Description:
 # Application de Gestion des Salles
 
