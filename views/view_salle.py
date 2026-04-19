@@ -1,7 +1,8 @@
 import customtkinter as ctk
 from tkinter import messagebox
-from models.salle import Salle
-from services.services_salle import ServiceSalle
+from Models.salle import Salle
+from Services.services_salle import ServiceSalle
+from tkinter import ttk
 
 class ViewSalle(ctk.CTk):
 
@@ -9,8 +10,11 @@ class ViewSalle(ctk.CTk):
         super().__init__()
         self.title("Gestion des Salles")
         self.service_salle = ServiceSalle()
+
         self._build_info_frame()
         self._build_action_frame()
+        self._build_list_frame()   # <-- IMPORTANT
+        self.lister_salles()
 
     def _build_info_frame(self):
         self.cadreInfo = ctk.CTkFrame(self, corner_radius=10)
@@ -40,6 +44,33 @@ class ViewSalle(ctk.CTk):
         ctk.CTkButton(self.cadreActions, text="Modifier",   command=self.modifier_salle).grid(row=0, column=1, padx=5)
         ctk.CTkButton(self.cadreActions, text="Supprimer",  command=self.supprimer_salle).grid(row=0, column=2, padx=5)
         ctk.CTkButton(self.cadreActions, text="Rechercher", command=self.rechercher_salle).grid(row=0, column=3, padx=5)
+
+    def _build_list_frame(self):
+        self.cadreList = ctk.CTkFrame(self, corner_radius=10, width=400)
+        self.cadreList.pack(pady=10, padx=10)
+
+        self.treeList = ttk.Treeview(
+            self.cadreList,
+            columns=("code", "description", "categorie", "capacite"),
+            show="headings"
+        )
+
+        self.treeList.heading("code", text="CODE")
+        self.treeList.heading("description", text="Description")
+        self.treeList.heading("categorie", text="Catégorie")
+        self.treeList.heading("capacite", text="Capacité")
+
+        self.treeList.column("code", width=50)
+        self.treeList.column("description", width=150)
+        self.treeList.column("categorie", width=100)
+        self.treeList.column("capacite", width=100)
+
+        self.treeList.pack(expand=True, fill="both", padx=10, pady=10)
+
+    def lister_salles(self):
+        self.treeList.delete(*self.treeList.get_children())
+        for s in self.service_salle.recuperer_salles():
+            self.treeList.insert("", "end", values=(s.code, s.description, s.categorie, s.capacite))
 
     def ajouter_salle(self):
         s = Salle(self.entry_code.get(), self.entry_desc.get(),
